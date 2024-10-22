@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Счет за Обед</title>
+    <!-- Подключение Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+    <!-- Подключение иконок Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <style>
+        /* Сброс стилей */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        /* Переменные темы */
+        :root {
+            --background-color: #f0f0f0;
+            --container-color: #ffffff;
+            --text-color: #333333;
+            --heading-color: #444444;
+            --input-bg-color: #ffffff;
+            --input-text-color: #333333;
+            --input-border-color: #cccccc;
+            --button-bg-color: #ff5722;
+            --button-text-color: #ffffff;
+            --guest-name-color: #ff9800;
+            --dish-item-bg: #f9f9f9;
+            --dish-guest-color: #555555;
+            --scrollbar-bg: #e0e0e0;
+            --scrollbar-thumb: #cccccc;
+            --checkbox-color: #ff5722;
+            --input-padding: 15px;
+            --input-font-size: 16px;
+            --button-padding: 15px 25px;
+            --button-font-size: 16px;
+            --border-radius: 8px;
+            --placeholder-color: #aaa;
+        }
+        [data-theme="dark"] {
+            --background-color: #121212;
+            --container-color: #1e1e1e;
+            --text-color: #e0e0e0;
+            --heading-color: #ffffff;
+            --input-bg-color: #2c2c2c;
+            --input-text-color: #ffffff;
+            --input-border-color: #424242;
+            --button-bg-color: #ff5722;
+            --button-text-color: #ffffff;
+            --guest-name-color: #ff9800;
+            --dish-item-bg: #2c2c2c;
+            --dish-guest-color: #bdbdbd;
+            --scrollbar-bg: #1e1e1e;
+            --scrollbar-thumb: #424242;
+            --checkbox-color: #ff9800;
+            --placeholder-color: #888;
+        }
+        /* Основные стили */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        h1, h2 {
+            text-align: center;
+            color: var(--heading-color);
+            margin-bottom: 20px;
+            transition: color 0.5s;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: var(--container-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.5s;
+            position: relative;
+        }
+        .theme-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: var(--text-color);
+            transition: color 0.5s;
+        }
+        .input-group {
+            margin: 20px 0;
+            text-align: center;
+        }
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: var(--input-padding);
+            width: 100%;
+            max-width: 100%;
+            margin: 10px 0;
+            border: 1px solid var(--input-border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--input-bg-color);
+            color: var(--input-text-color);
+            font-size: var(--input-font-size);
+            outline: none;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        input[type="text"]::placeholder,
+        input[type="number"]::placeholder {
+            color: var(--placeholder-color);
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: var(--button-bg-color);
+            background-color: var(--input-bg-color);
+        }
+        button {
+            padding: var(--button-padding);
+            cursor: pointer;
+            background-color: var(--button-bg-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            font-size: var(--button-font-size);
+            transition: background-color 0.3s;
+            margin-top: 10px;
+            width: 100%;
+            max-width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button:hover {
+            background-color: #e64a19;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: var(--input-bg-color);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        li:hover {
+            background-color: var(--dish-item-bg);
+        }
+        [data-theme="dark"] li:hover {
+            background-color: #2a2a2a;
+        }
+        .guest-name {
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--guest-name-color);
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+        }
+        .guest-name i {
+            margin-right: 10px;
+        }
+        .guest-name:hover {
+            text-decoration: underline;
+        }
+        .total {
+            font-weight: bold;
+            color: var(--heading-color);
+            margin-top: 10px;
+            font-size: 18px;
+        }
+        .full-list {
+            margin-top: 30px;
+        }
+        .dish-item {
+            margin: 10px 0;
+            padding: 15px;
+            background: var(--dish-item-bg);
+            border-radius: var(--border-radius);
+            color: var(--text-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .dish-guests {
+            font-size: 0.9em;
+            color: var(--dish-guest-color);
+            margin-top: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            font-weight: 500;
+            text-align: left;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .checkbox-group input[type="checkbox"] {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--input-border-color);
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s, border-color 0.3s;
+            margin: 0;
+        }
+        .checkbox-group input[type="checkbox"]:checked {
+            background-color: var(--checkbox-color);
+            border-color: var(--checkbox-color);
+        }
+        .checkbox-group input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 3px;
+            width: 5px;
+            height: 10px;
+            border: solid #fff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        .checkbox-group label {
+            margin-left: 10px;
+            font-weight: 400;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+        .checkbox-group label:hover {
+            text-decoration: underline;
+        }
+        select[multiple] {
+            width: 100%;
+            height: auto;
+            min-height: 150px;
+            padding: var(--input-padding);
+            background-color: var(--input-bg-color);
+            color: var(--input-text-color);
+            border: 1px solid var(--input-border-color);
+            border-radius: var(--border-radius);
+            outline: none;
+            margin-top: 10px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            overflow: auto;
+            font-size: var(--input-font-size);
+        }
+        select[multiple] option {
+            padding: 8px;
+            background-color: var(--input-bg-color);
+            color: var(--input-text-color);
+        }
+        select[multiple] option:hover {
+            background-color: #e0e0e0;
+        }
+        /* Стили для плавной анимации */
+        .list-enter-active, .list-leave-active {
+            transition: all 0.5s;
+        }
+        .list-enter, .list-leave-to {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        /* Стили для скроллбара */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        /* Адаптивный дизайн */
+        @media (max-width: 768px) {
+            h1, h2 {
+                font-size: 1.8em;
+            }
+            .input-group {
+                margin: 15px 0;
+            }
+            input[type="text"],
+            input[type="number"],
+            select,
+            button {
+                max-width: 100%;
+            }
+            li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .guest-name,
+            .total {
+                font-size: 1.2em;
+            }
+            .theme-switcher {
+                font-size: 1.2em;
+                top: 10px;
+                right: 10px;
+            }
+            .container {
+                padding: 15px;
+                border-radius: 10px;
+                box-shadow: none;
+            }
+        }
+        @media (max-width: 480px) {
+            h1, h2 {
+                font-size: 1.5em;
+            }
+            button {
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+            input[type="text"],
+            input[type="number"],
+            select {
+                padding: 12px 15px;
+                font-size: 16px;
+            }
+            .checkbox-group {
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+            }
+            .checkbox-group label {
+                margin-left: 10px;
+                margin-top: 0;
+            }
+            select[multiple] {
+                min-height: 120px;
+            }
+        }
+    </style>
+</head>
+<body :data-theme="currentTheme">
+    <div id="app" class="container">
+        <!-- Переключатель темы -->
+        <div class="theme-switcher" @click="toggleTheme">
+            <i :class="themeIcon"></i>
+        </div>
+        <h1><i class="fas fa-utensils"></i> Счет за Обед</h1>
+        <!-- Настройки -->
+        <div class="input-group">
+            <h2>Настройки</h2>
+            <label>Процент сервисного сбора:
+                <input v-model.number="serviceChargePercentage" type="number" min="0" step="1" placeholder="Введите процент">
+            </label>
+        </div>
+        <!-- Добавление нового гостя -->
+        <div class="input-group">
+            <h2>Добавить Гостя</h2>
+            <input v-model="newGuestName" placeholder="Имя гостя" class="styled-input">
+            <button @click="addGuest"><i class="fas fa-user-plus"></i> Добавить</button>
+        </div>
+        <!-- Список гостей -->
+        <div>
+            <h2>Гости</h2>
+            <transition-group name="list" tag="ul">
+                <li v-for="guest in guests" :key="guest.name" @click="selectGuest(guest)">
+                    <span class="guest-name"><i class="fas fa-user"></i> {{ guest.name }}</span>
+                    <span class="total">Сумма: {{ totalAmount(guest) }} ₸</span>
+                </li>
+            </transition-group>
+        </div>
+        <!-- Добавление блюда выбранному гостю -->
+        <div v-if="selectedGuest" class="input-group">
+            <h2>Добавить Блюдо для {{ selectedGuest.name }}</h2>
+            <input v-model="newDishName" placeholder="Название блюда" class="styled-input">
+            <input v-model.number="newDishPrice" placeholder="Цена" type="number" min="0" step="0.01" class="styled-input">
+            <div class="checkbox-group">
+                <input type="checkbox" id="shareDish" v-model="shareDish">
+                <label for="shareDish">Поделить блюдо с другими гостями</label>
+            </div>
+            <div v-if="shareDish">
+                <label>Выберите гостей:
+                    <select v-model="sharedWithGuests" multiple>
+                        <option v-for="guest in guests" :value="guest" :key="guest.name" v-if="guest !== selectedGuest">{{ guest.name }}</option>
+                    </select>
+                </label>
+            </div>
+            <button @click="addDish"><i class="fas fa-plus"></i> Добавить</button>
+        </div>
+        <!-- Список блюд выбранного гостя -->
+        <div v-if="selectedGuest">
+            <h2>Блюда {{ selectedGuest.name }}</h2>
+            <ul>
+                <transition-group name="list" tag="ul">
+                    <li v-for="(dish, index) in selectedGuest.dishes" :key="dish.name + index">
+                        {{ dish.name }} - {{ dish.price.toFixed(2) }} ₸
+                    </li>
+                </transition-group>
+            </ul>
+        </div>
+        <!-- Полный список блюд -->
+        <div class="full-list">
+            <h2>Полный Список Блюд</h2>
+            <ul>
+                <li v-for="(dish, index) in allDishes" :key="dish.name + index" class="dish-item">
+                    <div><i class="fas fa-hamburger"></i> {{ dish.name }} - {{ dish.totalPrice.toFixed(2) }} ₸</div>
+                    <div class="dish-guests">Разделено между: {{ dish.sharedGuestsNames }}</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Подключение Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <!-- Скрипт приложения -->
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                guests: [],
+                newGuestName: '',
+                selectedGuest: null,
+                newDishName: '',
+                newDishPrice: null,
+                serviceChargePercentage: 10, // Процент сервисного сбора
+                shareDish: false,
+                sharedWithGuests: [],
+                currentTheme: 'light', // Текущая тема
+            },
+            computed: {
+                allDishes() {
+                    // Собираем все уникальные блюда
+                    let dishes = [];
+                    let dishSet = new Set();
+
+                    this.guests.forEach(guest => {
+                        guest.dishes.forEach(dish => {
+                            if (!dishSet.has(dish.originalDish)) {
+                                dishSet.add(dish.originalDish);
+                                dishes.push(dish.originalDish);
+                            }
+                        });
+                    });
+                    return dishes;
+                },
+                themeIcon() {
+                    return this.currentTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+                }
+            },
+            methods: {
+                addGuest() {
+                    if (this.newGuestName.trim() !== '') {
+                        // Проверка на уникальность имени гостя
+                        if (this.guests.some(guest => guest.name === this.newGuestName.trim())) {
+                            alert('Гость с таким именем уже существует!');
+                            return;
+                        }
+                        this.guests.push({
+                            name: this.newGuestName.trim(),
+                            dishes: []
+                        });
+                        this.newGuestName = '';
+                    }
+                },
+                selectGuest(guest) {
+                    this.selectedGuest = guest;
+                    this.newDishName = '';
+                    this.newDishPrice = null;
+                    this.shareDish = false;
+                    this.sharedWithGuests = [];
+                },
+                addDish() {
+                    if (this.newDishName.trim() !== '' && this.newDishPrice !== null) {
+                        const dishPrice = parseFloat(this.newDishPrice);
+                        const dishName = this.newDishName.trim();
+
+                        let sharingGuests = [this.selectedGuest];
+
+                        if (this.shareDish && this.sharedWithGuests.length > 0) {
+                            sharingGuests = [this.selectedGuest, ...this.sharedWithGuests];
+                        }
+
+                        const sharePrice = dishPrice / sharingGuests.length;
+
+                        // Создаем объект блюда
+                        const dish = {
+                            name: dishName,
+                            totalPrice: dishPrice,
+                            pricePerGuest: sharePrice,
+                            sharedGuests: sharingGuests,
+                            sharedGuestsNames: sharingGuests.map(guest => guest.name).join(', ')
+                        };
+
+                        // Добавляем блюдо каждому гостю
+                        sharingGuests.forEach(guest => {
+                            guest.dishes.push({
+                                name: dishName + (sharingGuests.length > 1 ? ' (доля)' : ''),
+                                price: sharePrice,
+                                originalDish: dish
+                            });
+                        });
+
+                        // Сброс полей ввода
+                        this.newDishName = '';
+                        this.newDishPrice = null;
+                        this.shareDish = false;
+                        this.sharedWithGuests = [];
+                    }
+                },
+                totalAmount(guest) {
+                    const sum = guest.dishes.reduce((total, dish) => total + dish.price, 0);
+                    const totalWithServiceCharge = sum + (sum * (this.serviceChargePercentage / 100));
+                    return totalWithServiceCharge.toFixed(2);
+                },
+                toggleTheme() {
+                    this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+                    document.body.setAttribute('data-theme', this.currentTheme);
+                }
+            },
+            mounted() {
+                // Проверка системной темы
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    this.currentTheme = 'dark';
+                    document.body.setAttribute('data-theme', 'dark');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
